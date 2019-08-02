@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Text;
 using Zengo.Config;
@@ -10,7 +11,7 @@ namespace Zengo
     public class ZengoLogger<TDataAdapter>
         where TDataAdapter : DbDataAdapter
     {
-        public DbConnection Connection { get; }
+        public IDbConnection Connection { get; }
 
         private IDictionary<Type, LoggerConfig> _configurations = new Dictionary<Type, LoggerConfig>();
 
@@ -19,7 +20,7 @@ namespace Zengo
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         }
 
-        public ZengoLogger(DbConnection connection)
+        public ZengoLogger(IDbConnection connection)
         {
             Connection = connection;
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.IO;
 using System.Linq;
@@ -9,16 +10,16 @@ using Zengo.Utils;
 namespace Zengo.Loggers
 {
     internal class PlaneTextLogger<TDataAdapter> : IZengoLogger
-        where TDataAdapter : DbDataAdapter
+        where TDataAdapter : IDbDataAdapter
     {
         public string Extension => ".log";
 
-        private DbConnection _connection;
+        private IDbConnection _connection;
         private PlaneTextLoggerConfig _config;
         private string _tableName;
         private string _filterString;
 
-        public PlaneTextLogger(DbConnection connection, PlaneTextLoggerConfig config, string tableName, string filterString)
+        public PlaneTextLogger(IDbConnection connection, PlaneTextLoggerConfig config, string tableName, string filterString)
         {
             _connection = connection;
             _config = config;
