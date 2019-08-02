@@ -1,0 +1,6 @@
+﻿/.vs
+/src/.vs/Zengo/v16
+/src/Test/bin/Debug/netcoreapp2.2
+/src/Test/obj
+/src/Zengo/bin/Debug/netstandard2.0
+/src/Zengo/obj
