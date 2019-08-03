@@ -8,211 +8,213 @@ namespace Test
 {
     public static class SqlTools
     {
-        public static Action<string, IEnumerable<(string Name, object Value)>> SqlLogAction { get; set; }
-        public static Action<string, object> SelectLogAction { get; set; }
-        public static Action<string, object> InsertLogAction { get; set; }
-        public static Action<string, object, object> UpdateLogAction { get; set; }
-        public static Action<string, object> DropLogAction { get; set; }
+        #region LOGGING
 
-        /// <summary>
-        /// General SQL Command
-        /// </summary>
-        /// <param name="connection"></param>
-        /// <param name="sql"></param>
-        /// <param name="parameters"></param>
-        /// <returns></returns>
-        public static IDbCommand GenerateSqlCommand(
-            IDbConnection connection,
-            string sql,
-            IEnumerable<(string, object)> parameters = null
-            )
+        public static Action<string, IEnumerable<(string Name, object Value)>> SqlLog { get; set; }
+        public static Action<string, object> SelectLog { get; set; }
+        public static Action<string, object> InsertLog { get; set; }
+        public static Action<string, object, object> UpdateLog { get; set; }
+        public static Action<string, object> DropLog { get; set; }
+
+        #endregion LOGGING
+
+        #region GENERAL-USE
+
+        public static IDbCommand SqlCommand(
+            this IDbConnection connection,
+            IDbTransaction transaction, string sql, IEnumerable<(string, object)> parameters)
         {
             var command = connection.CreateCommand();
 
             if (string.IsNullOrEmpty(sql))
                 throw new ArgumentException(nameof(sql));
             command.CommandText = sql;
+            command.Transaction = transaction;
 
-            if (parameters != null && parameters.Any())
+            if (parameters.Any())
             {
                 parameters.Distinct().ToList().ForEach(p =>
                 {
-                    var parameter = command.CreateParameter();
-                    parameter.ParameterName = p.Item1;
-                    parameter.Value = p.Item2;
-                    command.Parameters.Add(parameter);
+                    var cp = command.CreateParameter();
+                    cp.ParameterName = p.Item1;
+                    cp.Value = p.Item2;
+                    command.Parameters.Add(cp);
                 });
             }
 
-            SqlLogAction?.Invoke(command.CommandText,
+            SqlLog?.Invoke(command.CommandText,
                 command.Parameters.Cast<IDbDataParameter>().Select(p => (p.ParameterName, p.Value)));
 
             return command;
         }
 
-        /// <summary>
-        /// Simple Select Command
-        /// </summary>
-        /// <typeparam name="TQueryObject"></typeparam>
-        /// <typeparam name="TKeyObject"></typeparam>
-        /// <param name="connection"></param>
-        /// <param name="tableName"></param>
-        /// <param name="queryObject"></param>
-        /// <param name="keyObject"></param>
-        /// <param name="bindingFlags"></param>
-        /// <returns></returns>
-        public static IDbCommand GenerateSelectCommand<TQueryObject, TKeyObject>(
-            IDbConnection connection,
-            string tableName,
-            TQueryObject queryObject,
-            TKeyObject keyObject,
-            BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly
-            )
-        {
-            var parameters = GenerateParameters(queryObject);
-            var querySql = GetSelectInsertColumnsString(parameters);
-            if (string.IsNullOrEmpty(querySql))
-                querySql = "*";
+        public static IDbCommand SqlCommand(
+            this IDbConnection connection,
+            IDbTransaction transaction, string sql, params (string, object)[] parameters)
+            => connection.SqlCommand(transaction, sql, parameters.AsEnumerable());
 
-            var keys = GenerateParameters(keyObject);
-            var keySql = GetWhereConditionString(keys);
+        public static IDbCommand SqlCommand<TParameter>(
+            this IDbConnection connection,
+            IDbTransaction transaction, string sql, TParameter parameter,
+            BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
+            => connection.SqlCommand(transaction, sql, parameter.ToValueTuple(bindingFlags));
+
+        public static int ExecuteNonQuery(
+            this IDbConnection connection, IDbTransaction transaction, string sql)
+            => connection.SqlCommand(transaction, sql).ExecuteNonQuery();
+
+        public static int ExecuteNonQuery<TParameter>(
+            this IDbConnection connection, IDbTransaction transaction, string sql, TParameter parameters)
+            => connection.SqlCommand(transaction, sql, parameters).ExecuteNonQuery();
+
+        public static IDataReader ExecuteReader(
+            this IDbConnection connection, IDbTransaction transaction, string sql)
+            => connection.SqlCommand(transaction, sql).ExecuteReader();
+
+        public static IDataReader ExecuteReader<TParameter>(
+            this IDbConnection connection, IDbTransaction transaction, string sql, TParameter parameters)
+            => connection.SqlCommand(transaction, sql, parameters).ExecuteReader();
+
+        public static object ExecuteScalar(
+            this IDbConnection connection, IDbTransaction transaction, string sql)
+            => connection.SqlCommand(transaction, sql).ExecuteScalar();
+
+        public static object ExecuteScalar<TParameter>(
+            this IDbConnection connection, IDbTransaction transaction, string sql, TParameter parameters)
+            => connection.SqlCommand(transaction, sql, parameters).ExecuteScalar();
+
+        #endregion GENERAL-USE
+
+        #region SELECT
+
+        public static IDbCommand SelectCommand<TKey, TSelect>(
+            this IDbConnection connection,
+            string tableName, TKey key, TSelect select,
+            BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
+        {
+            var keys = key.ToValueTuple(bindingFlags);
+            var keySql = keys.ToWhereString();
+
+            var selects = select.ToValueTuple(bindingFlags);
+            var selectSql = selects.ToColumnsString();
+            if (string.IsNullOrEmpty(selectSql))
+                selectSql = "*";
 
             if (string.IsNullOrEmpty(tableName))
                 throw new ArgumentException(nameof(tableName));
 
-            var sql = $"select {querySql} from {tableName}{keySql}";
+            var sql = $"select {selectSql} from {tableName}{keySql}";
 
-            SelectLogAction?.Invoke(sql, keyObject);
+            SelectLog?.Invoke(sql, key);
 
-            return GenerateSqlCommand(connection, sql, parameters.Concat(keys).Distinct());
+            return connection.SqlCommand(null, sql, keys.Concat(selects).Distinct().ToArray());
         }
 
-        /// <summary>
-        /// Insert Command
-        /// </summary>
-        /// <typeparam name="TParameterObject"></typeparam>
-        /// <param name="connection"></param>
-        /// <param name="tableName"></param>
-        /// <param name="parameterObject"></param>
-        /// <param name="bindingFlags"></param>
-        /// <returns></returns>
-        public static IDbCommand GenerateInsertCommand<TParameterObject>(
-            IDbConnection connection,
-            string tableName,
-            TParameterObject parameterObject,
-            BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly
-            )
+        public static IDataReader ExecuteSelect<TKey, TSelect>(
+            this IDbConnection connection, string tableName, TKey key, TSelect select,
+            BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
+            => connection.SelectCommand(tableName, key, select, bindingFlags).ExecuteReader();
+
+        #endregion SELECT
+
+        #region UPDATE
+
+        public static IDbCommand UpdateCommand<TKey, TUpdate>(
+            this IDbConnection connection,
+            IDbTransaction transaction, string tableName, TKey key, TUpdate update,
+            BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
         {
-            var parameters = GenerateParameters(parameterObject);
-            if (!parameters.Any())
-                throw new ArgumentException(nameof(parameterObject));
-
-            var columnSql = GetSelectInsertColumnsString(parameters);
-            var valueSql = GetInsertValuesString(parameters);
-
-            if (string.IsNullOrEmpty(tableName))
-                throw new ArgumentException(nameof(tableName));
-            var sql = $"insert into {tableName} ({columnSql}) values ({valueSql});";
-
-            InsertLogAction?.Invoke(sql, parameterObject);
-
-            return GenerateSqlCommand(connection, sql, parameters);
-        }
-
-        /// <summary>
-        /// Update Command
-        /// </summary>
-        /// <typeparam name="TUpdateObject"></typeparam>
-        /// <typeparam name="TKeyObject"></typeparam>
-        /// <param name="connection"></param>
-        /// <param name="tableName"></param>
-        /// <param name="updateObject"></param>
-        /// <param name="keyObject"></param>
-        /// <param name="bindingFlags"></param>
-        /// <returns></returns>
-        public static IDbCommand GenerateUpdateCommand<TUpdateObject, TKeyObject>(
-            IDbConnection connection,
-            string tableName,
-            TUpdateObject updateObject,
-            TKeyObject keyObject,
-            BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly
-            )
-        {
-            var updates = GenerateParameters(updateObject);
+            var updates = update.ToValueTuple(bindingFlags);
             if (!updates.Any())
-                throw new ArgumentException(nameof(updateObject));
-            var updateSql = GetUpdateSetString(updates);
+                throw new ArgumentException(nameof(update));
+            var updateSql = updates.ToUpdateSetString();
 
-            var keys = GenerateParameters(keyObject);
-            var keySql = GetWhereConditionString(keys);
+            var keys = key.ToValueTuple(bindingFlags);
+            var keySql = keys.ToWhereString();
 
             if (string.IsNullOrEmpty(tableName))
                 throw new ArgumentException(nameof(tableName));
             var sql = $"update {tableName} set {updateSql}{keySql};";
 
-            UpdateLogAction?.Invoke(sql, updateObject, keyObject);
+            UpdateLog?.Invoke(sql, update, key);
 
-            return GenerateSqlCommand(connection, sql, updates.Concat(keys).Distinct());
+            return connection.SqlCommand(transaction, sql, updates.Concat(keys).Distinct().ToArray());
         }
 
-        /// <summary>
-        /// Delete Command
-        /// </summary>
-        /// <typeparam name="TKeyObject"></typeparam>
-        /// <param name="connection"></param>
-        /// <param name="tableName"></param>
-        /// <param name="keyObject"></param>
-        /// <param name="bindingFlags"></param>
-        /// <returns></returns>
-        public static IDbCommand GenerateDeleteCommand<TKeyObject>(
-            IDbConnection connection,
-            string tableName,
-            TKeyObject keyObject,
-            BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly
-            )
+        public static int ExecuteUpdate<TKey, TUpdate>(
+            this IDbConnection connection, IDbTransaction transaction, string tableName, TKey key, TUpdate update,
+            BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
+            => connection.UpdateCommand(transaction, tableName, key, update, bindingFlags).ExecuteNonQuery();
+
+        #endregion UPDATE
+
+        #region INSERT
+
+        public static IDbCommand InsertCommand<TParameter>(
+            this IDbConnection connection,
+            IDbTransaction transaction, string tableName, TParameter parameter,
+            BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
         {
-            var keys = GenerateParameters(keyObject);
-            var keySql = GetWhereConditionString(keys);
+            var parameters = parameter.ToValueTuple(bindingFlags);
+            if (!parameters.Any())
+                throw new ArgumentException(nameof(parameter));
+
+            var columns = parameters.ToColumnsString();
+            var values = parameters.ToParametersString();
+
+            if (string.IsNullOrEmpty(tableName))
+                throw new ArgumentException(nameof(tableName));
+            var sql = $"insert into {tableName} ({columns}) values ({values});";
+
+            InsertLog?.Invoke(sql, parameter);
+
+            return connection.SqlCommand(transaction, sql, parameters.ToArray());
+        }
+
+        public static int ExecuteInsert<TParameter>(
+            this IDbConnection connection, IDbTransaction transaction, string tableName, TParameter parameter,
+            BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
+            => connection.InsertCommand(transaction, tableName, parameter, bindingFlags).ExecuteNonQuery();
+
+        #endregion INSERT
+
+        #region DELETE
+
+        public static IDbCommand DeleteCommand<TKey>(
+            this IDbConnection connection,
+            IDbTransaction transaction, string tableName, TKey key,
+            BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
+        {
+            var keys = key.ToValueTuple(bindingFlags);
+            var keySql = keys.ToWhereString();
 
             if (string.IsNullOrEmpty(tableName))
                 throw new ArgumentException(nameof(tableName));
             var sql = $"delete from {tableName}{keySql};";
 
-            DropLogAction?.Invoke(sql, keyObject);
+            DropLog?.Invoke(sql, key);
 
-            return GenerateSqlCommand(connection, sql, keys);
+            return connection.SqlCommand(transaction, sql, keys.ToArray());
         }
 
-        /// <summary>
-        /// Convert object to IEnumerable<(string Name, object Value)>
-        /// </summary>
-        /// <typeparam name="TParameterObject"></typeparam>
-        /// <param name="parameterObject"></param>
-        /// <param name="bindingFlags"></param>
-        /// <returns></returns>
-        private static IEnumerable<(string Name, object Value)> GenerateParameters<TParameterObject>(
-            TParameterObject parameterObject,
-            BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly
-            )
-            => typeof(TParameterObject).GetProperties(bindingFlags)
-                .Select(pi => (pi.Name, pi.GetValue(parameterObject)));
+        public static int ExecuteDelete<TKey>(
+            this IDbConnection connection, IDbTransaction transaction, string tableName, TKey key,
+            BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
+            => connection.DeleteCommand(transaction, tableName, key, bindingFlags).ExecuteNonQuery();
 
-        /// <summary>
-        /// Convert IEnumerable<(string Name, object Value)> to "col1 = :col1, col2 = :col2" string
-        /// </summary>
-        /// <param name="elements"></param>
-        /// <returns></returns>
-        private static string GetUpdateSetString(IEnumerable<(string Name, object Value)> elements)
-            => string.Join(", ", elements.Select(p => $"{p.Name} = :{p.Name}"));
+        #endregion DELETE
 
-        /// <summary>
-        /// Convert IEnumerable<(string Name, object Value)> to " where col1 = :col1 and col2 = :col2" string
-        /// </summary>
-        /// <param name="elements"></param>
-        /// <returns></returns>
-        private static string GetWhereConditionString(IEnumerable<(string Name, object Value)> elements)
+        #region (PRIVATE)
+
+        private static IEnumerable<(string Name, object Value)> ToValueTuple<T>(this T obj, BindingFlags bindingFlags)
+            => typeof(T).GetProperties(bindingFlags).Select(p => (p.Name, p.GetValue(obj)));
+
+        private static string ToUpdateSetString(this IEnumerable<(string Name, object Value)> elements)
+            => string.Join(", ", elements.Select(elem => $"{elem.Name} = :{elem.Name}"));
+
+        private static string ToWhereString(this IEnumerable<(string Name, object Value)> elements)
         {
-            var sql = string.Join(" and ", elements.Select(p => $"{p.Name} = :{p.Name}"));
+            var sql = string.Join(" and ", elements.Select(elem => $"{elem.Name} = :{elem.Name}"));
 
             if (!string.IsNullOrEmpty(sql))
             {
@@ -222,24 +224,12 @@ namespace Test
             return sql;
         }
 
-        /// <summary>
-        /// Convert IEnumerable<(string Name, object Value)> to "col1, col2" string
-        /// </summary>
-        /// <param name="elements"></param>
-        /// <returns></returns>
-        private static string GetSelectInsertColumnsString(IEnumerable<(string Name, object Value)> elements)
-        {
-            return string.Join(", ", elements.Select(elem => elem.Name));
-        }
+        private static string ToColumnsString(this IEnumerable<(string Name, object Value)> elements)
+            => string.Join(", ", elements.Select(elem => elem.Name));
 
-        /// <summary>
-        /// Convert IEnumerable<(string Name, object Value)> to ":col1, :col2" string
-        /// </summary>
-        /// <param name="elements"></param>
-        /// <returns></returns>
-        private static string GetInsertValuesString(IEnumerable<(string Name, object Value)> elements)
-        {
-            return string.Join(", ", elements.Select(elem => $":{elem.Name}"));
-        }
+        private static string ToParametersString(this IEnumerable<(string Name, object Value)> elements)
+            => string.Join(", ", elements.Select(elem => $":{elem.Name}"));
+
+        #endregion (PRIVATE)
     }
 }
