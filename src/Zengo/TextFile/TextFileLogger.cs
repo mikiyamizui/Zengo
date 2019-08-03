@@ -3,36 +3,28 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
-using Zengo.Config;
+using Zengo.Abstracts;
 using Zengo.Utils;
 
-namespace Zengo.Loggers
+namespace Zengo.TextFile
 {
-    internal class PlaneTextLogger<TDataAdapter> : IZengoLogger
+    internal class TextFileLogger<TDataAdapter> : BaseLogger<TextFileLoggerConfig>
         where TDataAdapter : IDbDataAdapter
     {
-        public string Extension => ".log";
+        public override string Extension => ".log";
 
-        private IDbConnection _connection;
-        private PlaneTextLoggerConfig _config;
-        private string _tableName;
-        private string _filterString;
-
-        public PlaneTextLogger(IDbConnection connection, PlaneTextLoggerConfig config, string tableName, string filterString)
+        public TextFileLogger(IDbConnection connection, TextFileLoggerConfig configuraion, string tableName, string filterString)
+            : base(connection, configuraion, tableName, filterString)
         {
-            _connection = connection;
-            _config = config;
-            _tableName = tableName;
-            _filterString = filterString;
         }
 
-        public void OnWrite(TextWriter sw,
+        public override void OnWrite(TextWriter sw,
             (string ColumnName, Type DataType, int Length)[] columns,
             (int Ordinal, object Value, bool IsDBNull)[][] rows
             )
         {
             var columnLine = FormatLine(true, columns.Select(column => column.ColumnName.Pad(false, column.Length)));
-            var horizontalLine = FormatLine(false, columns.Select(column => new string(_config.HorizontalLineChar, column.Length)));
+            var horizontalLine = FormatLine(false, columns.Select(column => new string(Configuraion.HorizontalLineChar, column.Length)));
 
             sw.WriteLine(horizontalLine);
             sw.WriteLine(columnLine);
@@ -59,6 +51,10 @@ namespace Zengo.Loggers
                         || value is ushort
                         ;
 
+                    value = QuoteString(value, cell.IsDBNull, column.DataType);
+                    value = NullStringIfDBNull(value, cell.IsDBNull);
+                    value = EmptyStringIfEmpty(value, cell.IsDBNull);
+
                     return cell.Value.ToString().Pad(right, column.Length);
                 });
 
@@ -73,16 +69,16 @@ namespace Zengo.Loggers
         private string FormatLine(bool valueLine, IEnumerable<string> elements)
         {
             var first = valueLine
-                ? _config.ValueSeparatorFirst
-                : _config.LineSeparatorFirst;
+                ? Configuraion.ValueSeparatorFirst
+                : Configuraion.LineSeparatorFirst;
 
             var middle = valueLine
-                ? _config.ValueSeparator
-                : _config.LineSeparator;
+                ? Configuraion.ValueSeparatorMiddle
+                : Configuraion.LineSeparatorMiddle;
 
             var last = valueLine
-                ? _config.ValueSeparatorLast
-                : _config.LineSeparatorLast;
+                ? Configuraion.ValueSeparatorLast
+                : Configuraion.LineSeparatorLast;
 
             return (first + string.Join(middle, elements) + last);
         }

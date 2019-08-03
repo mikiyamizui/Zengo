@@ -3,38 +3,39 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Text;
-using Zengo.Config;
-using Zengo.Loggers;
+using Zengo.Abstracts;
+using Zengo.Core;
+using Zengo.Interfaces;
 
 namespace Zengo
 {
-    public class ZengoLogger<TDataAdapter>
+    public class ConfigManager<TDataAdapter>
         where TDataAdapter : DbDataAdapter
     {
         public IDbConnection Connection { get; }
 
-        private IDictionary<Type, LoggerConfig> _configurations = new Dictionary<Type, LoggerConfig>();
+        private IDictionary<Type, BaseLoggerConfig> _configurations = new Dictionary<Type, BaseLoggerConfig>();
 
-        static ZengoLogger()
+        static ConfigManager()
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         }
 
-        public ZengoLogger(IDbConnection connection)
+        public ConfigManager(IDbConnection connection)
         {
             Connection = connection;
         }
 
         public TConfiguraion GetConfiguration<TConfiguraion>()
-            where TConfiguraion : LoggerConfig
+            where TConfiguraion : BaseLoggerConfig
         {
-            var type = typeof(PlaneTextLoggerConfig);
+            var type = typeof(TConfiguraion);
             return _configurations.ContainsKey(type)
                 ? _configurations[type] as TConfiguraion
                 : Activator.CreateInstance<TConfiguraion>();
         }
 
-        public ZengoLogger<TDataAdapter> SetConfiguration<TConfiguration>(LoggerConfig configuration)
+        public ConfigManager<TDataAdapter> SetConfiguration<TConfiguration>(BaseLoggerConfig configuration)
         {
             _configurations.Add(configuration.GetType(), configuration);
             return this;

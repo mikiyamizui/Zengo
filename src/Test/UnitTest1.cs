@@ -4,6 +4,8 @@ using Serilog;
 using System;
 using System.Linq;
 using Zengo;
+using Zengo.CsvFile;
+using Zengo.TextFile;
 
 namespace Test
 {
@@ -39,9 +41,9 @@ namespace Test
                 Insert(conn, new { product_name = "Orange", product_price = 150, supplier_id = 2, created_by = "John", updated_by = "John" });
                 Insert(conn, new { product_name = "Melon", product_price = 200, supplier_id = 3, created_by = "John", updated_by = "John" });
 
-                var zl = new ZengoLogger<NpgsqlDataAdapter>(conn);
+                var zl = new ConfigManager<NpgsqlDataAdapter>(conn);
 
-                using (zl.Table(TableName, "order by product_id").AsPlaneText())
+                using (zl.Table(TableName, "order by product_id").AsTextFile().AsCsvFile())
                 {
                     Update(conn, new { product_price = 165, updated_at = DateTime.Now, updated_by = "Sam" }, new { product_id = 1 });
                 }
