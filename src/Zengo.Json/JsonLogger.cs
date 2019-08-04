@@ -8,7 +8,6 @@ namespace Zengo.Json
 {
     internal class JsonLogger : ILogger
     {
-        public IConfig Config => _config;
         private readonly JsonConfig _config;
 
         public JsonLogger(JsonConfig config)
@@ -27,7 +26,7 @@ namespace Zengo.Json
             tables.ToList().ForEach(table =>
             {
                 var dateTime = tables.Min(t => t.DateTime);
-                var fileName = $"{table.Name}-{dateTime.ToString(_config.FileNameFormat)}.json";
+                var fileName = string.Format($"{table.Name}-{_config.FileNameFormat}.json", dateTime);
 
                 using (var file = File.Open(fileName, FileMode.Create, FileAccess.Write, FileShare.Read))
                 using (var sw = new StreamWriter(file))

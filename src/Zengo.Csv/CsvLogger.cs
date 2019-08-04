@@ -8,7 +8,6 @@ namespace Zengo.Csv
 {
     internal class CsvLogger : ILogger
     {
-        public IConfig Config => _config;
         private readonly CsvConfig _config;
 
         public CsvLogger(CsvConfig config)
@@ -27,21 +26,29 @@ namespace Zengo.Csv
             tables.ToList().ForEach(table =>
             {
                 var dateTime = tables.Min(t => t.DateTime);
-                var fileName = $"{table.Name}-{dateTime.ToString(_config.FileNameFormat)}.csv";
+                var fileName = string.Format($"{table.Name}-{_config.FileNameFormat}.csv", dateTime);
 
                 using (var file = File.Open(fileName, FileMode.Create, FileAccess.Write, FileShare.Read))
                 using (var sw = new StreamWriter(file))
                 {
                     var columns = table.Columns;
 
+                    if (_config.OutputColumnLine)
+                    {
+                        sw.WriteLine(string.Join(",", columns.Select(column => Convert(column.Name))));
+                    }
+
                     table.Rows.ToList().ForEach(row =>
                     {
-                        sw.WriteLine(string.Join(",", row.Items.Select((item, index)
-                            => this.QuoteString(item.Value, item.IsDBNull, columns[index].DataType, force: true).ToString()
-                            )));
+                        sw.WriteLine(string.Join(",", row.Items.Select(item => Convert(item.Value, item.IsDBNull))));
                     });
                 }
             });
         }
+
+        private string Convert(object value, bool isDBNull = false)
+            => isDBNull
+            ? _config.NullString
+            : "\"" + value?.ToString().Replace("\"", "\"\"") + "\"";
     }
 }

@@ -8,7 +8,6 @@ namespace Zengo.Excel
 {
     internal class ExcelLogger : ILogger
     {
-        public IConfig Config => _config;
         private readonly ExcelConfig _config;
 
         public ExcelLogger(ExcelConfig config)
@@ -57,8 +56,8 @@ namespace Zengo.Excel
                                 ApplyStyleConfig(cell2.Style, _config.ChangedValueStyle);
 
                                 var columnName = item2.Column.Name;
-                                var value1 = this.NullStringIfDBNull(item1.Value, item1.IsDBNull).ToString();
-                                var value2 = this.NullStringIfDBNull(item2.Value, item2.IsDBNull).ToString();
+                                var value1 = Convert(item1.Value, item1.IsDBNull).ToString();
+                                var value2 = Convert(item2.Value, item2.IsDBNull).ToString();
 
                                 cell2.Comment
                                     .AddText($"{table1.Name}.{columnName}").AddNewLine()
@@ -111,8 +110,8 @@ namespace Zengo.Excel
                     }
                 });
 
-                var dateTime = tables1.Min(table => table.DateTime).ToString(_config.FileNameFormat);
-                var fileName = $"{dateTime}.xlsx";
+                var dateTime = tables1.Min(table => table.DateTime);
+                var fileName = string.Format($"{_config.FileNameFormat}.xlsx", dateTime);
 
                 wb.SaveAs(fileName);
             }
@@ -207,5 +206,8 @@ namespace Zengo.Excel
             if (config.Right != null)
                 border.RightBorder = config.Right.Value;
         }
+
+        private object Convert(object value, bool isDBNull)
+            => isDBNull ? _config.NullString : $"'{value}'";
     }
 }
