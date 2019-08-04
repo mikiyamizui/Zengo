@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.Common;
-using Zengo.Core;
 using Zengo.Interfaces;
 
 namespace Zengo
 {
-    public interface IManager<TDataAdapter>
-        where TDataAdapter : DbDataAdapter
+    public interface IBuilder
     {
         IDictionary<string, string> Tables { get; }
 
@@ -16,6 +12,6 @@ namespace Zengo
 
         IEnumerable<ITable> CollectTables();
 
-        Disposable<TDataAdapter> ToDisposable();
+        IDisposable ToDisposable();
     }
 }

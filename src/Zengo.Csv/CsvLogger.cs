@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -7,10 +6,10 @@ using Zengo.Interfaces;
 
 namespace Zengo.Csv
 {
-    internal class CsvLogger<TDataAdapter> : ILogger
+    internal class CsvLogger : ILogger
     {
         public IConfig Config => _config;
-        private CsvConfig _config;
+        private readonly CsvConfig _config;
 
         public CsvLogger(CsvConfig config)
         {

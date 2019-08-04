@@ -1,14 +1,12 @@
-﻿using ClosedXML.Excel;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
-using System.IO;
 using System.Linq;
+using ClosedXML.Excel;
 using Zengo.Interfaces;
 
 namespace Zengo.Excel
 {
-    internal class ExcelLogger<TDataAdapter> : ILogger
+    internal class ExcelLogger : ILogger
     {
         public IConfig Config => _config;
         private readonly ExcelConfig _config;

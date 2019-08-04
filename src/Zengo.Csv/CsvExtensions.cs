@@ -1,18 +1,15 @@
-﻿using System.Data.Common;
-using Zengo.Csv;
-using Zengo.Interfaces;
+﻿using Zengo.Csv;
 
 namespace Zengo
 {
     public static class CsvExtensions
     {
-        public static IManager<TDataAdapter> AsCsv<TDataAdapter>(
-            this IManager<TDataAdapter> self,
+        public static IBuilder AsCsv(
+            this IBuilder self,
             string tableName, string filterSql = null, CsvConfig config = null)
-            where TDataAdapter : DbDataAdapter
         {
             self.Tables[tableName] = filterSql;
-            self.Loggers.Add(new CsvLogger<TDataAdapter>(config ?? new CsvConfig()));
+            self.Loggers.Add(new CsvLogger(config ?? new CsvConfig()));
             return self;
         }
     }

@@ -1,18 +1,15 @@
-﻿using System.Data.Common;
-using Zengo.Excel;
-using Zengo.Interfaces;
+﻿using Zengo.Excel;
 
 namespace Zengo
 {
     public static class ExcelExtensions
     {
-        public static IManager<TDataAdapter> AsExcel<TDataAdapter>(
-            this IManager<TDataAdapter> self,
+        public static IBuilder AsExcel(
+            this IBuilder self,
             string tableName, string filterSql = null, ExcelConfig config = null)
-            where TDataAdapter : DbDataAdapter
         {
             self.Tables[tableName] = filterSql;
-            self.Loggers.Add(new ExcelLogger<TDataAdapter>(config ?? new ExcelConfig()));
+            self.Loggers.Add(new ExcelLogger(config ?? new ExcelConfig()));
 
             return self;
         }

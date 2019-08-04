@@ -1,3 +1,5 @@
+using System;
+using System.Threading.Tasks;
 using Dapper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Npgsql;
@@ -18,7 +20,21 @@ namespace Test
             {
                 connection.Open();
 
-                connection.Execute($@"
+                SetupTestData(connection);
+
+                using (connection.Zengo().AsCsv(table, filter).AsExcel(table, filter).ToDisposable())
+                {
+                    Task.Delay(TimeSpan.FromSeconds(3)).Wait();
+
+                    connection.Execute($@"update {table} set product_price = @product_price, updated_at = now(), updated_by = @updated_by where product_id = @product_id",
+                        new { product_id = 1, product_price = 165, updated_by = "Sam" });
+                }
+            }
+        }
+
+        private void SetupTestData(NpgsqlConnection connection)
+        {
+            connection.Execute($@"
 drop table if exists zengo_test;
 create table {table}
 (
@@ -34,25 +50,13 @@ create table {table}
 );
 ");
 
-                connection.Execute($@"insert into {table} (product_name, product_price, supplier_id, created_by, updated_by) values (@product_name, @product_price, @supplier_id, @created_by, @updated_by)",
-                    new[]
-                    {
-                        new { product_name = "Apple", product_price = 100, supplier_id = 1, created_by = "John", updated_by = "John" },
-                        new { product_name = "Orange", product_price = 150, supplier_id = 2, created_by = "John", updated_by = "John" },
-                        new { product_name = "Melon", product_price = 200, supplier_id = 3, created_by = "John", updated_by = "John" }
-                    });
-
-                using (connection.Zengo<NpgsqlDataAdapter>()
-                    .AsCsv(table, filter)
-                    .AsExcel(table, filter)
-                    .ToDisposable())
+            connection.Execute($@"insert into {table} (product_name, product_price, supplier_id, created_by, updated_by) values (@product_name, @product_price, @supplier_id, @created_by, @updated_by)",
+                new[]
                 {
-                    //Task.Delay(TimeSpan.FromSeconds(3)).Wait();
-
-                    connection.Execute($@"update {table} set product_price = @product_price, updated_at = now(), updated_by = @updated_by where product_id = @product_id",
-                        new { product_id = 1, product_price = 165, updated_by = "Sam" });
-                }
-            }
+                    new { product_name = "Apple", product_price = 100, supplier_id = 1, created_by = "John", updated_by = "John" },
+                    new { product_name = "Orange", product_price = 150, supplier_id = 2, created_by = "John", updated_by = "John" },
+                    new { product_name = "Melon", product_price = 200, supplier_id = 3, created_by = "John", updated_by = "John" }
+                });
         }
     }
 }

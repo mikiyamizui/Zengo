@@ -1,30 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Linq;
 using Zengo.Core;
 using Zengo.Interfaces;
 
 namespace Zengo
 {
-    public class Manager<TDataAdapter> : IManager<TDataAdapter>
-        where TDataAdapter : DbDataAdapter
+    public class Builder : IBuilder
     {
-        private IDbConnection _connection;
-
         public IDictionary<string, string> Tables { get; } = new Dictionary<string, string>();
 
         public IList<ILogger> Loggers { get; } = new List<ILogger>();
 
-        internal Manager(IDbConnection connection)
+        private readonly IDbConnection _connection;
+
+        internal Builder(IDbConnection connection)
         {
             _connection = connection;
         }
 
-        public Disposable<TDataAdapter> ToDisposable()
+        public IDisposable ToDisposable()
         {
-            return new Disposable<TDataAdapter>(this);
+            return new Disposable(this);
         }
 
         public IEnumerable<ITable> CollectTables()
