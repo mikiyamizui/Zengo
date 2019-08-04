@@ -5,11 +5,25 @@ namespace Zengo.Excel
 {
     public class ExcelConfig : Config
     {
-        public bool AutoSortByMostLeftColumn { get; set; } = false;
+        public bool AutoSortByFirstColumn { get; set; } = false;
 
-        public string DateTimeFormat { get; set; } = "yyyy-MM-dd HH:mm:ss.ffff";
+        public bool GroupTableRows { get; set; } = true;
+
+        public string DateTimeHeaderStringFormat { get; set; } = "yyyy-MM-dd HH:mm:ss.ffff";
 
         public XLBorderStyleValues TableOutlineBorderStyle { get; set; } = XLBorderStyleValues.Thin;
+
+        public string UnchangedTabColor { get; set; } = null;
+
+        public string ChangedTabColor { get; set; } = "#f96";
+
+        public string ChangedWorksheetNamePrefix { get; set; } = null;
+
+        public string ChangedWorksheetNameSuffix { get; set; } = "(changed)";
+
+        public bool ProtectSheet { get; set; } = true;
+
+        public string ProtectPassword { get; set; } = null;
 
         public ExcelStyleConfig DefaultStyle { get; }
             = new ExcelStyleConfig

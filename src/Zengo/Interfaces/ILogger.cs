@@ -25,7 +25,7 @@ namespace Zengo.Interfaces
             where TLogger : ILogger
             => isDBNull && string.IsNullOrEmpty(value?.ToString())
             ? logger.Config.NullString
-            : value;
+            : $"'{value}'";
 
         public static object EmptyStringIfEmpty<TLogger>(this TLogger logger, object value, bool isDBNull)
             where TLogger : ILogger

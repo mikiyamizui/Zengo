@@ -8,14 +8,15 @@ namespace Zengo
 {
     internal class Table : ITable
     {
+        public DateTime DateTime { get; }
+
         public string Name { get; }
+
         public string Sql { get; }
 
         public IReadOnlyList<IColumn> Columns { get; }
 
         public IReadOnlyList<IRow> Rows { get; }
-
-        public DateTime DateTime { get; }
 
         public Table(string name, string sql, IEnumerable<IColumn> columns, IEnumerable<IRow> rows, bool sort)
         {

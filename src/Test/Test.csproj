@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Zengo.Csv\Zengo.Csv.csproj" />
     <ProjectReference Include="..\Zengo.Excel\Zengo.Excel.csproj" />
+    <ProjectReference Include="..\Zengo.Json\Zengo.Json.csproj" />
     <ProjectReference Include="..\Zengo\Zengo.csproj" />
   </ItemGroup>
 

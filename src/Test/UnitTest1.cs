@@ -22,7 +22,11 @@ namespace Test
 
                 SetupTestData(connection);
 
-                using (connection.Zengo().AsCsv(table, filter).AsExcel(table, filter).ToDisposable())
+                using (connection.Zengo()
+                    .AsCsv(table, filter)
+                    .AsExcel(table, filter)
+                    .AsJson(table, filter)
+                    .ToDisposable())
                 {
                     Task.Delay(TimeSpan.FromSeconds(3)).Wait();
 

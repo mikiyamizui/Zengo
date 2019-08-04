@@ -18,11 +18,11 @@ namespace Zengo.Csv
 
         public void Write(IEnumerable<ITable> before, IEnumerable<ITable> after)
         {
-            Write(before);
-            Write(after);
+            WriteCsv(before);
+            WriteCsv(after);
         }
 
-        private void Write(IEnumerable<ITable> tables)
+        private void WriteCsv(IEnumerable<ITable> tables)
         {
             tables.ToList().ForEach(table =>
             {

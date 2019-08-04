@@ -7,9 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zengo", "Zengo\Zengo.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "Test\Test.csproj", "{4F19B1D2-32A2-4971-B00F-6281C6ACEB69}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zengo.Excel", "Zengo.Excel\Zengo.Excel.csproj", "{D6F60C5A-7487-4F06-8467-0C3B62812953}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zengo.Excel", "Zengo.Excel\Zengo.Excel.csproj", "{D6F60C5A-7487-4F06-8467-0C3B62812953}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zengo.Csv", "Zengo.Csv\Zengo.Csv.csproj", "{ECF486F7-316A-4674-911B-8F9F72CDDC9A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zengo.Csv", "Zengo.Csv\Zengo.Csv.csproj", "{ECF486F7-316A-4674-911B-8F9F72CDDC9A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zengo.Json", "Zengo.Json\Zengo.Json.csproj", "{02449625-A2F6-4A7D-8F71-C86CD6EF8A47}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{ECF486F7-316A-4674-911B-8F9F72CDDC9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ECF486F7-316A-4674-911B-8F9F72CDDC9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ECF486F7-316A-4674-911B-8F9F72CDDC9A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02449625-A2F6-4A7D-8F71-C86CD6EF8A47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02449625-A2F6-4A7D-8F71-C86CD6EF8A47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02449625-A2F6-4A7D-8F71-C86CD6EF8A47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02449625-A2F6-4A7D-8F71-C86CD6EF8A47}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

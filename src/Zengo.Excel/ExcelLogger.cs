@@ -28,23 +28,44 @@ namespace Zengo.Excel
                 {
                     var (table1, table2) = _;
 
+                    var dateTime1 = table1.DateTime.ToString(_config.DateTimeHeaderStringFormat);
+                    var dateTime2 = table2.DateTime.ToString(_config.DateTimeHeaderStringFormat);
+
                     var ws = wb.AddWorksheet(table1.Name);
 
                     var pos1 = ws.Cell(2, 2);
                     var range1 = InsertTable(ws, table1, pos1);
+                    var zip1 = range1.RowsUsed().Zip(table1.Rows, (xlRow, zeRow) => (xlRow, zeRow))
+                        .SelectMany(x => x.xlRow.CellsUsed().Zip(x.zeRow.Items, (cell, item) => (cell, item)));
 
                     var pos2 = range1.LastRowUsed().FirstCellUsed().CellBelow(2);
                     var range2 = InsertTable(ws, table2, pos2);
+                    var zip2 = range2.RowsUsed().Zip(table2.Rows, (xlRow, zeRow) => (xlRow, zeRow))
+                        .SelectMany(x => x.xlRow.CellsUsed().Zip(x.zeRow.Items, (cell, item) => (cell, item)));
 
-                    var range = range1.Cells().Zip(range2.Cells(), (c1, c2) => (c1, c2));
-
-                    foreach (var (cell1, cell2) in range)
-                    {
-                        if (cell1.Value.ToString() != cell2.Value.ToString())
+                    var changed = false;
+                    zip1.Zip(zip2, (z1, z2) => (z1, z2)).ToList().ForEach(z =>
                         {
-                            ApplyStyleConfig(cell2.Style, _config.ChangedValueStyle);
-                        }
-                    }
+                            var cell1 = z.z1.cell;
+                            var cell2 = z.z2.cell;
+                            var item1 = z.z1.item;
+                            var item2 = z.z2.item;
+
+                            if (item1.Value.ToString() != item2.Value.ToString())
+                            {
+                                changed = true;
+                                ApplyStyleConfig(cell2.Style, _config.ChangedValueStyle);
+
+                                var columnName = item2.Column.Name;
+                                var value1 = this.NullStringIfDBNull(item1.Value, item1.IsDBNull).ToString();
+                                var value2 = this.NullStringIfDBNull(item2.Value, item2.IsDBNull).ToString();
+
+                                cell2.Comment
+                                    .AddText($"{table1.Name}.{columnName}").AddNewLine()
+                                    .AddText($"{value1} -> {value2}").AddNewLine()
+                                    ;
+                            }
+                        });
 
                     ws.FirstColumn().Width = 10;
 
@@ -59,10 +80,39 @@ namespace Zengo.Excel
 
                     ws.ColumnsUsed().Width = maxWidth * 1.1;
                     ws.RowsUsed().Height = maxHeight * 1.1;
+
+                    if (changed)
+                    {
+                        if (!string.IsNullOrEmpty(_config.ChangedTabColor))
+                            ws.SetTabColor(XLColor.FromHtml(_config.ChangedTabColor));
+
+                        if (!string.IsNullOrEmpty(_config.ChangedWorksheetNamePrefix))
+                            ws.Name = $"{_config.ChangedWorksheetNamePrefix} {ws.Name}";
+
+                        if (!string.IsNullOrEmpty(_config.ChangedWorksheetNameSuffix))
+                            ws.Name = $"{ws.Name} {_config.ChangedWorksheetNameSuffix}";
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(_config.UnchangedTabColor))
+                            ws.SetTabColor(XLColor.FromHtml(_config.UnchangedTabColor));
+                    }
+
+                    if (_config.ProtectSheet)
+                    {
+                        (!string.IsNullOrEmpty(_config.ProtectPassword)
+                            ? ws.Protect(_config.ProtectPassword)
+                            : ws.Protect())
+                            .SetInsertColumns()
+                            .SetDeleteColumns()
+                            .SetInsertRows()
+                            .SetDeleteRows()
+                            ;
+                    }
                 });
 
-                var dateTime = tables1.Min(table => table.DateTime);
-                var fileName = $"{dateTime.ToString(_config.FileNameFormat)}.xlsx";
+                var dateTime = tables1.Min(table => table.DateTime).ToString(_config.FileNameFormat);
+                var fileName = $"{dateTime}.xlsx";
 
                 wb.SaveAs(fileName);
             }
@@ -71,7 +121,7 @@ namespace Zengo.Excel
         private IXLRange InsertTable(IXLWorksheet ws, ITable table, IXLCell startCell)
         {
             var dateTimeHeaderRange = ws.Range(startCell, startCell.CellRight(table.Columns.Count - 1));
-            var dateTimeHeaderStyle = dateTimeHeaderRange.Merge().SetValue(table.DateTime.ToString(_config.DateTimeFormat)).Style;
+            var dateTimeHeaderStyle = dateTimeHeaderRange.Merge().SetValue(table.DateTime.ToString(_config.DateTimeHeaderStringFormat)).Style;
             dateTimeHeaderStyle.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
             ApplyStyleConfig(dateTimeHeaderStyle, _config.DateTimeHeaderStyle);
 
@@ -106,9 +156,15 @@ namespace Zengo.Excel
             tableRange.CreateTable();
             tableRange.Style.Border.OutsideBorder = _config.TableOutlineBorderStyle;
 
-            if (_config.AutoSortByMostLeftColumn)
+            if (_config.AutoSortByFirstColumn)
             {
                 dataRange.Sort();
+            }
+
+            if (_config.GroupTableRows)
+            {
+                ws.Rows(tableRange.FirstRowUsed().RowNumber(), tableRange.LastRowUsed().RowNumber())
+                    .Group();
             }
 
             return dataRange;
