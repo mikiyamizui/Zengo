@@ -1,8 +1,8 @@
 ﻿using Zengo.Abstracts;
 
-namespace Zengo.TextFile
+namespace Zengo.Text
 {
-    public class TextFileLoggerConfig : BaseLoggerConfig
+    public class TextConfig : ConfigBase
     {
         public char HorizontalLineChar { get; set; } = '-';
         public string LineSeparatorFirst { get; set; } = "+-";

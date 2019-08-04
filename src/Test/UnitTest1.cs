@@ -1,25 +1,19 @@
 using Dapper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Npgsql;
-using Serilog;
-using System;
-using System.Threading.Tasks;
 using Zengo;
-using Zengo.CsvFile;
-using Zengo.TextFile;
 
 namespace Test
 {
     [TestClass]
     public class UnitTest1
     {
+        private const string table = "zengo_test";
+        private const string filter = "";//"order by product_id";
+
         [TestMethod]
         public void TestMethod1()
         {
-            var logger = new LoggerConfiguration()
-                .WriteTo.File("sql.log")
-                .CreateLogger();
-
             using (var connection = new NpgsqlConnection("Server=localhost;Port=5432;Database=test;UserId=postgres;Password=postgres;Enlist=true;"))
             {
                 connection.Open();
@@ -48,18 +42,17 @@ create table {table}
                         new { product_name = "Melon", product_price = 200, supplier_id = 3, created_by = "John", updated_by = "John" }
                     });
 
-                var zl = new ConfigManager<NpgsqlDataAdapter>(connection);
-
-                using (zl.Table(table, "order by product_id").AsTextFile().AsCsvFile())
+                using (connection.Zengo<NpgsqlDataAdapter>()
+                    .AsCsv(table, filter)
+                    .AsExcel(table, filter)
+                    .ToDisposable())
                 {
-                    Task.Delay(TimeSpan.FromSeconds(3)).Wait();
+                    //Task.Delay(TimeSpan.FromSeconds(3)).Wait();
 
                     connection.Execute($@"update {table} set product_price = @product_price, updated_at = now(), updated_by = @updated_by where product_id = @product_id",
                         new { product_id = 1, product_price = 165, updated_by = "Sam" });
                 }
             }
         }
-
-        private const string table = "zengo_test";
     }
 }
