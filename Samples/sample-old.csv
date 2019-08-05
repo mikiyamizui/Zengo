@@ -1,0 +1,4 @@
+"product_id","product_name","product_price","supplier_id","created_at","created_by","updated_at","updated_by"
+"1","Apple","100","1","2019/08/05 1:25:41","John","2019/08/05 1:25:41","John"
+"2","Orange","150","2","2019/08/05 1:25:41","John","2019/08/05 1:25:41","John"
+"3","Melon","200","3","2019/08/05 1:25:41","John","2019/08/05 1:25:41","John"

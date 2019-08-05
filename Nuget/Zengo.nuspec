@@ -16,9 +16,9 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="..\src\Zengo\bin\Release\netstandard2.0\Zengo.dll" target="lib\netstandard2.0" />
-    <file src="..\src\Zengo.Csv\bin\Release\netstandard2.0\Zengo.Csv.dll" target="lib\netstandard2.0" />
-    <file src="..\src\Zengo.Excel\bin\Release\netstandard2.0\Zengo.Excel.dll" target="lib\netstandard2.0" />
-    <file src="..\src\Zengo.Json\bin\Release\netstandard2.0\Zengo.Json.dll" target="lib\netstandard2.0" />
+    <file src="..\Zengo\bin\Release\netstandard2.0\Zengo.dll" target="lib\netstandard2.0" />
+    <file src="..\Zengo.Csv\bin\Release\netstandard2.0\Zengo.Csv.dll" target="lib\netstandard2.0" />
+    <file src="..\Zengo.Excel\bin\Release\netstandard2.0\Zengo.Excel.dll" target="lib\netstandard2.0" />
+    <file src="..\Zengo.Json\bin\Release\netstandard2.0\Zengo.Json.dll" target="lib\netstandard2.0" />
   </files>
 </package>

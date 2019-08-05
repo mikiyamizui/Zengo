@@ -1,0 +1,290 @@
+{
+  "$id": "1",
+  "DateTime": "2019-08-05T01:25:41.1933656+09:00",
+  "Name": "zengo_test",
+  "Sql": "select * from zengo_test",
+  "Columns": {
+    "$type": "System.Collections.Generic.List`1[[Zengo.Interfaces.IColumn, Zengo]], System.Private.CoreLib",
+    "$values": [
+      {
+        "$id": "2",
+        "$type": "Zengo.Core.Column, Zengo",
+        "Name": "product_id",
+        "DataType": "System.Int32, System.Private.CoreLib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e"
+      },
+      {
+        "$id": "3",
+        "$type": "Zengo.Core.Column, Zengo",
+        "Index": 1,
+        "Name": "product_name",
+        "DataType": "System.String, System.Private.CoreLib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e"
+      },
+      {
+        "$id": "4",
+        "$type": "Zengo.Core.Column, Zengo",
+        "Index": 2,
+        "Name": "product_price",
+        "DataType": "System.Decimal, System.Private.CoreLib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e"
+      },
+      {
+        "$id": "5",
+        "$type": "Zengo.Core.Column, Zengo",
+        "Index": 3,
+        "Name": "supplier_id",
+        "DataType": "System.Int32, System.Private.CoreLib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e"
+      },
+      {
+        "$id": "6",
+        "$type": "Zengo.Core.Column, Zengo",
+        "Index": 4,
+        "Name": "created_at",
+        "DataType": "System.DateTime, System.Private.CoreLib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e"
+      },
+      {
+        "$id": "7",
+        "$type": "Zengo.Core.Column, Zengo",
+        "Index": 5,
+        "Name": "created_by",
+        "DataType": "System.String, System.Private.CoreLib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e"
+      },
+      {
+        "$id": "8",
+        "$type": "Zengo.Core.Column, Zengo",
+        "Index": 6,
+        "Name": "updated_at",
+        "DataType": "System.DateTime, System.Private.CoreLib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e"
+      },
+      {
+        "$id": "9",
+        "$type": "Zengo.Core.Column, Zengo",
+        "Index": 7,
+        "Name": "updated_by",
+        "DataType": "System.String, System.Private.CoreLib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e"
+      }
+    ]
+  },
+  "Rows": {
+    "$type": "System.Collections.Generic.List`1[[Zengo.Interfaces.IRow, Zengo]], System.Private.CoreLib",
+    "$values": [
+      {
+        "$id": "10",
+        "$type": "Zengo.Core.Row, Zengo",
+        "Items": {
+          "$type": "System.Collections.Generic.List`1[[Zengo.Interfaces.IItem, Zengo]], System.Private.CoreLib",
+          "$values": [
+            {
+              "$id": "11",
+              "$type": "Zengo.Core.Item, Zengo",
+              "Column": {
+                "$ref": "2"
+              },
+              "Value": 1
+            },
+            {
+              "$id": "12",
+              "$type": "Zengo.Core.Item, Zengo",
+              "Column": {
+                "$ref": "3"
+              },
+              "Value": "Apple"
+            },
+            {
+              "$id": "13",
+              "$type": "Zengo.Core.Item, Zengo",
+              "Column": {
+                "$ref": "4"
+              },
+              "Value": 100.0
+            },
+            {
+              "$id": "14",
+              "$type": "Zengo.Core.Item, Zengo",
+              "Column": {
+                "$ref": "5"
+              },
+              "Value": 1
+            },
+            {
+              "$id": "15",
+              "$type": "Zengo.Core.Item, Zengo",
+              "Column": {
+                "$ref": "6"
+              },
+              "Value": "2019-08-05T01:25:41.159124+09:00"
+            },
+            {
+              "$id": "16",
+              "$type": "Zengo.Core.Item, Zengo",
+              "Column": {
+                "$ref": "7"
+              },
+              "Value": "John"
+            },
+            {
+              "$id": "17",
+              "$type": "Zengo.Core.Item, Zengo",
+              "Column": {
+                "$ref": "8"
+              },
+              "Value": "2019-08-05T01:25:41.159124+09:00"
+            },
+            {
+              "$id": "18",
+              "$type": "Zengo.Core.Item, Zengo",
+              "Column": {
+                "$ref": "9"
+              },
+              "Value": "John"
+            }
+          ]
+        }
+      },
+      {
+        "$id": "19",
+        "$type": "Zengo.Core.Row, Zengo",
+        "Items": {
+          "$type": "System.Collections.Generic.List`1[[Zengo.Interfaces.IItem, Zengo]], System.Private.CoreLib",
+          "$values": [
+            {
+              "$id": "20",
+              "$type": "Zengo.Core.Item, Zengo",
+              "Column": {
+                "$ref": "2"
+              },
+              "Value": 2
+            },
+            {
+              "$id": "21",
+              "$type": "Zengo.Core.Item, Zengo",
+              "Column": {
+                "$ref": "3"
+              },
+              "Value": "Orange"
+            },
+            {
+              "$id": "22",
+              "$type": "Zengo.Core.Item, Zengo",
+              "Column": {
+                "$ref": "4"
+              },
+              "Value": 150.0
+            },
+            {
+              "$id": "23",
+              "$type": "Zengo.Core.Item, Zengo",
+              "Column": {
+                "$ref": "5"
+              },
+              "Value": 2
+            },
+            {
+              "$id": "24",
+              "$type": "Zengo.Core.Item, Zengo",
+              "Column": {
+                "$ref": "6"
+              },
+              "Value": "2019-08-05T01:25:41.173316+09:00"
+            },
+            {
+              "$id": "25",
+              "$type": "Zengo.Core.Item, Zengo",
+              "Column": {
+                "$ref": "7"
+              },
+              "Value": "John"
+            },
+            {
+              "$id": "26",
+              "$type": "Zengo.Core.Item, Zengo",
+              "Column": {
+                "$ref": "8"
+              },
+              "Value": "2019-08-05T01:25:41.173316+09:00"
+            },
+            {
+              "$id": "27",
+              "$type": "Zengo.Core.Item, Zengo",
+              "Column": {
+                "$ref": "9"
+              },
+              "Value": "John"
+            }
+          ]
+        }
+      },
+      {
+        "$id": "28",
+        "$type": "Zengo.Core.Row, Zengo",
+        "Items": {
+          "$type": "System.Collections.Generic.List`1[[Zengo.Interfaces.IItem, Zengo]], System.Private.CoreLib",
+          "$values": [
+            {
+              "$id": "29",
+              "$type": "Zengo.Core.Item, Zengo",
+              "Column": {
+                "$ref": "2"
+              },
+              "Value": 3
+            },
+            {
+              "$id": "30",
+              "$type": "Zengo.Core.Item, Zengo",
+              "Column": {
+                "$ref": "3"
+              },
+              "Value": "Melon"
+            },
+            {
+              "$id": "31",
+              "$type": "Zengo.Core.Item, Zengo",
+              "Column": {
+                "$ref": "4"
+              },
+              "Value": 200.0
+            },
+            {
+              "$id": "32",
+              "$type": "Zengo.Core.Item, Zengo",
+              "Column": {
+                "$ref": "5"
+              },
+              "Value": 3
+            },
+            {
+              "$id": "33",
+              "$type": "Zengo.Core.Item, Zengo",
+              "Column": {
+                "$ref": "6"
+              },
+              "Value": "2019-08-05T01:25:41.173792+09:00"
+            },
+            {
+              "$id": "34",
+              "$type": "Zengo.Core.Item, Zengo",
+              "Column": {
+                "$ref": "7"
+              },
+              "Value": "John"
+            },
+            {
+              "$id": "35",
+              "$type": "Zengo.Core.Item, Zengo",
+              "Column": {
+                "$ref": "8"
+              },
+              "Value": "2019-08-05T01:25:41.173792+09:00"
+            },
+            {
+              "$id": "36",
+              "$type": "Zengo.Core.Item, Zengo",
+              "Column": {
+                "$ref": "9"
+              },
+              "Value": "John"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
