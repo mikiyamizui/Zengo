@@ -16,9 +16,10 @@ job2:
   services:
     - postgres:latest
   variables:
-    POSTGRES_DB: test
-    POSTGRES_USER: postgres
-    POSTGRES_PASSWORD: "postgres"
+    POSTGRES_DB: zengo
+    POSTGRES_USER: zengo
+    POSTGRES_PASSWORD: ""
+    DB_CONNECTION_STRING: "Server=postgres;Username=zengo;Database=zengo;"
   script:
     - dotnet restore
     - dotnet test ./Tests
