@@ -13,6 +13,12 @@ job1:
     - docker
 job2:
   stage: test
+  services:
+    - postgres:latest
+  variables:
+    POSTGRES_DB: test
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: "postgres"
   script:
     - dotnet restore
     - dotnet test ./Tests
