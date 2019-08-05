@@ -15,7 +15,7 @@ job2:
   stage: test
   script:
     - dotnet restore
-    - dotnet test
+    - dotnet test ./Tests
   only:
     - master
   tags:
