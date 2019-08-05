@@ -1,8 +1,13 @@
 image: microsoft/dotnet:latest
 
 stages:
+  - setup
   - build
   - test
+
+setup:
+  script:
+    - apt install libgdiplus
 
 build:
   stage: build
