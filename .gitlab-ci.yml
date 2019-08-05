@@ -1,13 +1,8 @@
 image: microsoft/dotnet:latest
 
 stages:
-  - setup
   - build
   - test
-
-setup:
-  script:
-    - apt install libgdiplus
 
 build:
   stage: build
@@ -27,6 +22,12 @@ test:
     POSTGRES_PASSWORD: ""
     DB_CONNECTION_STRING: "Server=postgres;Username=zengo;Database=zengo;"
   script:
+    - apt-get update \
+      && apt-get install -y --allow-unauthenticated \
+        libc6-dev \
+        libgdiplus \
+        libx11-dev \
+     && rm -rf /var/lib/apt/lists/*
     - dotnet restore
     - dotnet test ./Tests
   only:
