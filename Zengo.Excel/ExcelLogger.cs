@@ -72,13 +72,13 @@ namespace Zengo.Excel
                     //ws.RowsUsed().AdjustToContents();
 
                     var maxWidth = ws.ColumnsUsed().Max(r => r.Width);
-                    var maxHeight = ws.RowsUsed().Max(c => c.Height);
+                    //var maxHeight = ws.RowsUsed().Max(c => c.Height);
 
-                    ws.Columns().Width = 5;
-                    ws.Rows().Height = 5;
+                    ws.Columns().Width = 20;
+                    ws.Rows().Height = 20;
 
                     ws.ColumnsUsed().Width = maxWidth * 1.1;
-                    ws.RowsUsed().Height = maxHeight * 1.1;
+                    //ws.RowsUsed().Height = maxHeight * 1.1;
 
                     if (changed)
                     {

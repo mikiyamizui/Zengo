@@ -1,0 +1,23 @@
+image: microsoft/dotnet:sdk
+stages:
+  - build
+  - test
+job1:
+  stage: build
+  script:
+    - dotnet restore
+    - dotnet build ./src/Test --framework netcoreapp2.1
+  only:
+    - master
+  tags:
+    - docker
+job2:
+  stage: test
+  script:
+    # - dotnet restore
+    # - dotnet test ./Tests
+    - dotnet test ./Tests --framework netcoreapp2.1
+  only:
+    - master
+  tags:
+    - docker

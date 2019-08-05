@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Zengo</id>
+    <version>0.1.0</version>
+    <description>This package provides the function to save database tables before and after changes as CSV, JSON and Excel files. It's designed for the purpose to automatically generate evidence files in unit-tests.</description>
+    <authors>Mikiya Mizui</authors>
+    <copyright>Copyright ©2019 Mikiya Mizui</copyright>
+    <projectUrl>https://github.com/mikiyamizui/Zengo</projectUrl>
+    <license type="expression">Apache-2.0</license>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <tags>test csv json excel db database unittest unit-test</tags>
+    <dependencies>
+      <dependency id="ClosedXML" version="0.94.2" />
+      <dependency id="Newtonsoft.Json" version="12.0.2" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="..\src\Zengo\bin\Release\netstandard2.0\Zengo.dll" target="lib\netstandard2.0" />
+    <file src="..\src\Zengo.Csv\bin\Release\netstandard2.0\Zengo.Csv.dll" target="lib\netstandard2.0" />
+    <file src="..\src\Zengo.Excel\bin\Release\netstandard2.0\Zengo.Excel.dll" target="lib\netstandard2.0" />
+    <file src="..\src\Zengo.Json\bin\Release\netstandard2.0\Zengo.Json.dll" target="lib\netstandard2.0" />
+  </files>
+</package>
