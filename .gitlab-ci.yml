@@ -1,22 +1,30 @@
-image: microsoft/dotnet:sdk
+image: microsoft/dotnet:latest
+
 stages:
   - build
   - test
-job1:
+
+build:
   stage: build
   script:
     - dotnet restore
     - dotnet build
-  only:
-    - master
-  tags:
-    - docker
-job2:
+#  tags:
+#    - docker
+
+test:
   stage: test
+  services:
+    - postgres:latest
+  variables:
+    POSTGRES_DB: zengo
+    POSTGRES_USER: zengo
+    POSTGRES_PASSWORD: ""
+    DB_CONNECTION_STRING: "Server=postgres;Username=zengo;Database=zengo;"
   script:
     - dotnet restore
     - dotnet test ./Tests
   only:
     - master
-  tags:
-    - docker
+#  tags:
+#    - docker

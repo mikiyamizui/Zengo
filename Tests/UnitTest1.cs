@@ -16,7 +16,8 @@ namespace Test
         [TestMethod]
         public void TestMethod1()
         {
-            using (var connection = new NpgsqlConnection("Server=localhost;Port=5432;Database=test;UserId=postgres;Password=postgres;Enlist=true;"))
+            var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+            using (var connection = new NpgsqlConnection(connectionString))
             {
                 connection.Open();
 
