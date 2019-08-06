@@ -22,6 +22,12 @@ test:
     POSTGRES_PASSWORD: zengo
     DB_CONNECTION_STRING: "Server=postgres;Port=5432;Username=zengo;Password=zengo;Database=zengo;"
   script:
+    - apt-get update \
+      && apt-get install -y --allow-unauthenticated \
+        libc6-dev \
+        libgdiplus \
+        libx11-dev \
+     && rm -rf /var/lib/apt/lists/*
     - dotnet restore
     - dotnet test ./test
   only:
