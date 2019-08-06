@@ -1,4 +1,4 @@
-﻿namespace Zengo.Excel
+﻿namespace Zengo
 {
     public class ExcelStyleConfig
     {

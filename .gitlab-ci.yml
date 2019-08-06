@@ -9,8 +9,8 @@ build:
   script:
     - dotnet restore
     - dotnet build
-#  tags:
-#    - docker
+  tags:
+    - docker
 
 test:
   stage: test
@@ -19,12 +19,12 @@ test:
   variables:
     POSTGRES_DB: zengo
     POSTGRES_USER: zengo
-    POSTGRES_PASSWORD: ""
-    DB_CONNECTION_STRING: "Server=postgres;Username=zengo;Database=zengo;"
+    POSTGRES_PASSWORD: zengo
+    DB_CONNECTION_STRING: "Server=postgres;Port=5432;Username=zengo;Password=zengo;Database=zengo;"
   script:
     - dotnet restore
-    - dotnet test ./Tests
+    - dotnet test ./test
   only:
     - master
-#  tags:
-#    - docker
+  tags:
+    - docker

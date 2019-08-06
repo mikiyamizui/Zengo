@@ -5,9 +5,9 @@ using System.Linq;
 using Zengo.Core;
 using Zengo.Interfaces;
 
-namespace Zengo
+namespace Zengo.Core
 {
-    public class Builder : IBuilder
+    internal class Builder : IBuilder
     {
         public IDictionary<string, string> Tables { get; } = new Dictionary<string, string>();
 

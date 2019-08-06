@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Zengo.Json
+namespace Zengo
 {
     public class JsonConfig : Config
     {

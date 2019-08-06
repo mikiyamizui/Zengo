@@ -1,6 +1,6 @@
 ﻿using ClosedXML.Excel;
 
-namespace Zengo.Excel
+namespace Zengo
 {
     public class ExcelConfig : Config
     {

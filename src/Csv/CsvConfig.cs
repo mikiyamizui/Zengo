@@ -1,4 +1,4 @@
-﻿namespace Zengo.Csv
+﻿namespace Zengo
 {
     public class CsvConfig : Config
     {

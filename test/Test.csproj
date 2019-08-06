@@ -1,11 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Dapper" Version="1.60.6" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
@@ -13,12 +11,7 @@
     <PackageReference Include="MSTest.TestFramework" Version="1.4.0" />
     <PackageReference Include="Npgsql" Version="4.0.8" />
   </ItemGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\Zengo.Csv\Zengo.Csv.csproj" />
-    <ProjectReference Include="..\Zengo.Excel\Zengo.Excel.csproj" />
-    <ProjectReference Include="..\Zengo.Json\Zengo.Json.csproj" />
-    <ProjectReference Include="..\Zengo\Zengo.csproj" />
+    <ProjectReference Include="..\src\Zengo.csproj" />
   </ItemGroup>
-
 </Project>

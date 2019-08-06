@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using Zengo.Core;
 
 namespace Zengo
 {
