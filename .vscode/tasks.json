@@ -2,48 +2,37 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "build-zengo",
-      "command": "dotnet",
+      "label": "build",
       "type": "process",
-      "args": ["build", "${workspaceFolder}/Zengo/Zengo.csproj"],
-      "problemMatcher": "$msCompile",
-      "dependsOn": []
-    },
-    {
-      "label": "build-zengo-csv",
-      "command": "dotnet",
-      "type": "process",
-      "args": ["build", "${workspaceFolder}/Zengo.Csv/Zengo.Csv.csproj"],
-      "problemMatcher": "$msCompile",
-      "dependsOn": ["build-zengo"]
-    },
-    {
-      "label": "build-zengo-excel",
-      "command": "dotnet",
-      "type": "process",
-      "args": ["build", "${workspaceFolder}/Zengo.Excel/Zengo.Excel.csproj"],
-      "problemMatcher": "$msCompile",
-      "dependsOn": ["build-zengo"]
-    },
-    {
-      "label": "build-zengo-json",
-      "command": "dotnet",
-      "type": "process",
-      "args": ["build", "${workspaceFolder}/Zengo.Json/Zengo.Json.csproj"],
-      "problemMatcher": "$msCompile",
-      "dependsOn": ["build-zengo"]
-    },
-    {
-      "label": "build-tests",
-      "command": "dotnet",
-      "type": "process",
+      "command": "docker-compose",
+      "args": ["build", "--compress", "--force-rm"],
       "group": {
         "kind": "build",
         "isDefault": true
       },
-      "args": ["build", "${workspaceFolder}/Tests/Tests.csproj"],
       "problemMatcher": "$msCompile",
-      "dependsOn": ["build-zengo-csv", "build-zengo-excel", "build-zengo-json"]
+      "dependsOn": []
+    },
+    {
+      "label": "test",
+      "type": "process",
+      "command": "docker-compose",
+      "args": ["up", "--abort-on-container-exit"],
+      "group": "test",
+      "problemMatcher": "$msCompile",
+      "dependsOn": ["build"]
+    },
+    {
+      "label": "test and cleanup",
+      "type": "process",
+      "command": "docker-compose",
+      "args": ["down", "--rmi", "local"],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": "$msCompile",
+      "dependsOn": ["test"]
     }
   ]
 }

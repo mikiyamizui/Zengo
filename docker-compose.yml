@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+
+  test:
+    container_name: test
+    image: mikiyamizui/zengo:test
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      DB_CONNECTION_STRING: "Server=db;Port=5432;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=${POSTGRES_DB};"
+    depends_on:
+      - db
+
+  db:
+    container_name: db
+    image: postgres:alpine
+    restart: always
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
