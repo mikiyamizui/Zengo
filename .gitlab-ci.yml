@@ -9,8 +9,8 @@ build:
   script:
     - dotnet restore
     - dotnet build
-  tags:
-    - docker
+#  tags:
+#    - docker
 
 test:
   stage: test
@@ -22,15 +22,10 @@ test:
     POSTGRES_PASSWORD: zengo
     DB_CONNECTION_STRING: "Server=postgres;Port=5432;Username=zengo;Password=zengo;Database=zengo;"
   script:
-    - apt-get update \
-      && apt-get install -y --allow-unauthenticated \
-        libc6-dev \
-        libgdiplus \
-        libx11-dev \
-      && rm -rf /var/lib/apt/lists/*
+    - apt-get update && apt-get install -y --allow-unauthenticated libgif-dev autoconf libtool automake build-essential gettext libglib2.0-dev libcairo2-dev libtiff-dev libexif-dev libgdiplus && rm -rf /var/lib/apt/lists/*
     - dotnet restore
     - dotnet test
-  only:
-    - master
-  tags:
-    - docker
+#  only:
+#    - master
+#  tags:
+#    - docker
