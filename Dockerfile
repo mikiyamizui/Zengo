@@ -9,5 +9,6 @@ RUN apt-get update \
 FROM base AS test-env
 WORKDIR /app
 COPY . .
-RUN dotnet restore && dotnet build -c Release
+RUN dotnet restore
+RUN dotnet build -c Release
 ENTRYPOINT [ "dotnet", "test", "test/Test.csproj" ]
