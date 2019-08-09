@@ -4,7 +4,7 @@ namespace Zengo
 {
     public static class CsvExtensions
     {
-        public static IBuilder AsCsv(
+        public static IBuilder SaveAsCsv(
             this IBuilder self,
             string tableName, string filterSql = null, CsvConfig config = null)
         {

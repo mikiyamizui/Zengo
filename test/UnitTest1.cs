@@ -18,6 +18,7 @@ namespace Test
         public void TestMethod1()
         {
             var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+
             using (var connection = new NpgsqlConnection(connectionString))
             {
                 connection.Open();
@@ -40,9 +41,9 @@ namespace Test
                 };
 
                 using (connection.Zengo()
-                    .AsCsv(TABLE, FILTER, csvConfig)
-                    .AsExcel(TABLE, FILTER, excelConfig)
-                    .AsJson(TABLE, FILTER, jsonConfig)
+                    .SaveAsCsv(TABLE, FILTER, csvConfig)
+                    .SaveAsExcel(TABLE, FILTER, excelConfig)
+                    .SaveAsJson(TABLE, FILTER, jsonConfig)
                     .ToDisposable())
                 {
                     Task.Delay(TimeSpan.FromSeconds(3)).Wait();

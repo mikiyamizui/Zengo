@@ -4,7 +4,7 @@ namespace Zengo
 {
     public static class ExcelExtensions
     {
-        public static IBuilder AsExcel(
+        public static IBuilder SaveAsExcel(
             this IBuilder self,
             string tableName, string filterSql = null, ExcelConfig config = null)
         {

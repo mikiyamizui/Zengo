@@ -4,7 +4,7 @@ namespace Zengo
 {
     public static class JsonExtensions
     {
-        public static IBuilder AsJson(
+        public static IBuilder SaveAsJson(
             this IBuilder self,
             string tableName, string filterSql = null, JsonConfig config = null)
         {
