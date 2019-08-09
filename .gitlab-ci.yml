@@ -1,4 +1,8 @@
-image: microsoft/dotnet:latest
+image: docker:stable
+
+before_script:
+  - apk add --no-cache py-pip
+  - pip install docker-compose
 
 stages:
   - build
@@ -6,26 +10,14 @@ stages:
 
 build:
   stage: build
+  tags:
+    - docker
   script:
-    - dotnet restore
-    - dotnet build
-#  tags:
-#    - docker
+    - docker-compose build
 
 test:
   stage: test
-  services:
-    - postgres:latest
-  variables:
-    POSTGRES_DB: zengo
-    POSTGRES_USER: zengo
-    POSTGRES_PASSWORD: zengo
-    DB_CONNECTION_STRING: "Server=postgres;Port=5432;Username=zengo;Password=zengo;Database=zengo;"
+  tags:
+    - docker
   script:
-    - apt-get update && apt-get install -y --allow-unauthenticated libgif-dev autoconf libtool automake build-essential gettext libglib2.0-dev libcairo2-dev libtiff-dev libexif-dev libgdiplus && rm -rf /var/lib/apt/lists/*
-    - dotnet restore
-    - dotnet test
-#  only:
-#    - master
-#  tags:
-#    - docker
+    - docker-compose run test --rm
