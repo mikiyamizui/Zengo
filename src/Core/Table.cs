@@ -25,16 +25,14 @@ namespace Zengo
 
             if (autoSort && Columns.Any())
             {
-                IOrderedEnumerable<IRow> ordered = null;
+                var ordered = rows.OrderBy(row => row.Items.First().Value);
+                rows = Columns.Skip(1).Aggregate(ordered, (o, c) => o.ThenBy(row => row.Items[c.Index].Value));
 
-                for (int i = 0; i < Columns.Count; i++)
-                {
-                    ordered = i == 0
-                        ? ordered.OrderBy(row => row.Items[i].Value)
-                        : ordered.ThenBy(row => row.Items[i].Value);
-                }
-
+                /*
+                Enumerable.Range(0, Columns.Count).Skip(1).ToList()
+                    .ForEach(i => ordered = ordered.ThenBy(row => row.Items[i].Value));
                 rows = ordered;
+                */
             }
 
             Rows = rows.ToList();
