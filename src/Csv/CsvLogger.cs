@@ -2,6 +2,7 @@
 using System.Data;
 using System.IO;
 using System.Linq;
+using CsvHelper;
 using Zengo.Interfaces;
 
 namespace Zengo.Csv
@@ -29,18 +30,21 @@ namespace Zengo.Csv
                 var fileName = string.Format($"{table.Name}-{_config.FileNameFormat}.csv", dateTime);
 
                 using (var file = File.Open(fileName, FileMode.Create, FileAccess.Write, FileShare.Read))
-                using (var sw = new StreamWriter(file))
+                using (var sw = new StreamWriter(file, _config.Encoding))
+                using (var csv = new CsvWriter(sw))
                 {
                     var columns = table.Columns;
 
                     if (_config.OutputColumnLine)
                     {
-                        sw.WriteLine(string.Join(",", columns.Select(column => Convert(column.Name))));
+                        columns.ToList().ForEach(column => csv.WriteField(column.Name, _config.ForceQuote));
+                        csv.NextRecord();
                     }
 
                     table.Rows.ToList().ForEach(row =>
                     {
-                        sw.WriteLine(string.Join(",", row.Items.Select(item => Convert(item.Value, item.IsDBNull))));
+                        row.Items.ToList().ForEach(item => csv.WriteField(item.Value.ToString(), _config.ForceQuote));
+                        csv.NextRecord();
                     });
                 }
             });
