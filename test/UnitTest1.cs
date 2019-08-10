@@ -16,7 +16,7 @@ namespace Test
         [TestMethod]
         public void TestMethod1()
         {
-            Zengo.Config.Csv.Encoding = Encoding.GetEncoding(932);
+            //Zengo.Config.Csv.Encoding = Encoding.GetEncoding(932);
 
             using (_connection.Zengo()
                 .SaveAsCsv(TableName)
