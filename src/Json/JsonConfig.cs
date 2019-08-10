@@ -1,9 +1,10 @@
 ﻿using Newtonsoft.Json;
 
-namespace Zengo
+namespace Zengo.Json
 {
-    public class JsonConfig : Config
+    public class JsonConfig : JsonSerializerSettings
     {
+        /*
         public JsonSerializerSettings JsonSerializerSettings { get; set; }
             = new JsonSerializerSettings
             {
@@ -22,5 +23,6 @@ namespace Zengo
                 TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
                 TypeNameHandling = TypeNameHandling.Auto,
             };
+        */
     }
 }

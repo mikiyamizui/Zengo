@@ -1,8 +1,8 @@
 ﻿using ClosedXML.Excel;
 
-namespace Zengo
+namespace Zengo.Excel
 {
-    public class ExcelConfig : Config
+    public class ExcelConfig
     {
         public bool AutoSortByFirstColumn { get; set; } = false;
 

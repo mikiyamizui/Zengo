@@ -6,10 +6,10 @@ namespace Zengo
     {
         public static IBuilder SaveAsCsv(
             this IBuilder self,
-            string tableName, string filterSql = null, CsvConfig config = null)
+            string tableName, string filterSql = null)
         {
             self.Tables[tableName] = filterSql;
-            self.Loggers.Add(new CsvLogger(config ?? new CsvConfig()));
+            self.Loggers.Add(new CsvLogger());
             return self;
         }
     }

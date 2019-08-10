@@ -1,7 +1,7 @@
 ﻿using System.Text;
-namespace Zengo
+namespace Zengo.Csv
 {
-    public class CsvConfig : Config
+    public class CsvConfig
     {
         public Encoding Encoding { get; set; } = Encoding.Default;
         public bool OutputColumnLine { get; set; } = true;

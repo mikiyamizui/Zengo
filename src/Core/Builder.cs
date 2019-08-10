@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using Zengo.Core;
 using Zengo.Interfaces;
 
 namespace Zengo.Core

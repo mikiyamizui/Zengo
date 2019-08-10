@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using ClosedXML.Excel;
 using Zengo.Interfaces;
@@ -8,18 +7,11 @@ namespace Zengo.Excel
 {
     internal class ExcelLogger : ILogger
     {
-        private readonly ExcelConfig _config;
-
-        public ExcelLogger(ExcelConfig config)
-        {
-            _config = config;
-        }
-
         public void Write(IEnumerable<ITable> tables1, IEnumerable<ITable> tables2)
         {
             using (var wb = new XLWorkbook())
             {
-                ApplyStyleConfig(wb.Style, _config.DefaultStyle);
+                ApplyStyleConfig(wb.Style, Config.Excel.DefaultStyle);
 
                 var tables = tables1.Zip(tables2, (table1, table2) => (table1, table2));
 
@@ -27,8 +19,8 @@ namespace Zengo.Excel
                 {
                     var (table1, table2) = _;
 
-                    var dateTime1 = table1.DateTime.ToString(_config.DateTimeHeaderStringFormat);
-                    var dateTime2 = table2.DateTime.ToString(_config.DateTimeHeaderStringFormat);
+                    var dateTime1 = table1.DateTime.ToString(Config.Excel.DateTimeHeaderStringFormat);
+                    var dateTime2 = table2.DateTime.ToString(Config.Excel.DateTimeHeaderStringFormat);
 
                     var ws = wb.AddWorksheet(table1.Name);
 
@@ -53,7 +45,7 @@ namespace Zengo.Excel
                             if (item1.Value.ToString() != item2.Value.ToString())
                             {
                                 changed = true;
-                                ApplyStyleConfig(cell2.Style, _config.ChangedValueStyle);
+                                ApplyStyleConfig(cell2.Style, Config.Excel.ChangedValueStyle);
 
                                 var columnName = item2.Column.Name;
                                 var value1 = Convert(item1.Value, item1.IsDBNull).ToString();
@@ -82,25 +74,25 @@ namespace Zengo.Excel
 
                     if (changed)
                     {
-                        if (!string.IsNullOrEmpty(_config.ChangedTabColor))
-                            ws.SetTabColor(XLColor.FromHtml(_config.ChangedTabColor));
+                        if (!string.IsNullOrEmpty(Config.Excel.ChangedTabColor))
+                            ws.SetTabColor(XLColor.FromHtml(Config.Excel.ChangedTabColor));
 
-                        if (!string.IsNullOrEmpty(_config.ChangedWorksheetNamePrefix))
-                            ws.Name = $"{_config.ChangedWorksheetNamePrefix} {ws.Name}";
+                        if (!string.IsNullOrEmpty(Config.Excel.ChangedWorksheetNamePrefix))
+                            ws.Name = $"{Config.Excel.ChangedWorksheetNamePrefix} {ws.Name}";
 
-                        if (!string.IsNullOrEmpty(_config.ChangedWorksheetNameSuffix))
-                            ws.Name = $"{ws.Name} {_config.ChangedWorksheetNameSuffix}";
+                        if (!string.IsNullOrEmpty(Config.Excel.ChangedWorksheetNameSuffix))
+                            ws.Name = $"{ws.Name} {Config.Excel.ChangedWorksheetNameSuffix}";
                     }
                     else
                     {
-                        if (!string.IsNullOrEmpty(_config.UnchangedTabColor))
-                            ws.SetTabColor(XLColor.FromHtml(_config.UnchangedTabColor));
+                        if (!string.IsNullOrEmpty(Config.Excel.UnchangedTabColor))
+                            ws.SetTabColor(XLColor.FromHtml(Config.Excel.UnchangedTabColor));
                     }
 
-                    if (_config.ProtectSheet)
+                    if (Config.Excel.ProtectSheet)
                     {
-                        (!string.IsNullOrEmpty(_config.ProtectPassword)
-                            ? ws.Protect(_config.ProtectPassword)
+                        (!string.IsNullOrEmpty(Config.Excel.ProtectPassword)
+                            ? ws.Protect(Config.Excel.ProtectPassword)
                             : ws.Protect())
                             .SetInsertColumns()
                             .SetDeleteColumns()
@@ -111,7 +103,7 @@ namespace Zengo.Excel
                 });
 
                 var dateTime = tables1.Min(table => table.DateTime);
-                var fileName = string.Format($"{_config.FileNameFormat}.xlsx", dateTime);
+                var fileName = string.Format($"{Config.FileNameFormat}.xlsx", dateTime);
 
                 wb.SaveAs(fileName);
             }
@@ -120,22 +112,22 @@ namespace Zengo.Excel
         private IXLRange InsertTable(IXLWorksheet ws, ITable table, IXLCell startCell)
         {
             var dateTimeHeaderRange = ws.Range(startCell, startCell.CellRight(table.Columns.Count - 1));
-            var dateTimeHeaderStyle = dateTimeHeaderRange.Merge().SetValue(table.DateTime.ToString(_config.DateTimeHeaderStringFormat)).Style;
+            var dateTimeHeaderStyle = dateTimeHeaderRange.Merge().SetValue(table.DateTime.ToString(Config.Excel.DateTimeHeaderStringFormat)).Style;
             dateTimeHeaderStyle.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
-            ApplyStyleConfig(dateTimeHeaderStyle, _config.DateTimeHeaderStyle);
+            ApplyStyleConfig(dateTimeHeaderStyle, Config.Excel.DateTimeHeaderStyle);
 
             var sqlHeaderStartCell = dateTimeHeaderRange.FirstColumn().LastCellUsed().CellBelow();
             var sqlHeaderRange = ws.Range(sqlHeaderStartCell, sqlHeaderStartCell.CellRight(table.Columns.Count - 1));
             var sqlHeaderStyle = sqlHeaderRange.Merge().SetValue(table.Sql).Style;
             sqlHeaderStyle.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
-            ApplyStyleConfig(sqlHeaderStyle, _config.SqlHeaderStyle);
+            ApplyStyleConfig(sqlHeaderStyle, Config.Excel.SqlHeaderStyle);
 
             var columns = table.Columns.Select(column => column.Name).ToArray();
             var columnHeaderStartCell = sqlHeaderRange.FirstColumn().LastCellUsed().CellBelow();
             var columnHeaderRange = columnHeaderStartCell.InsertData(new[] { columns });
             var columnHeaderStyle = columnHeaderRange.Style;
             columnHeaderStyle.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
-            ApplyStyleConfig(columnHeaderStyle, _config.ColumnHeaderStyle);
+            ApplyStyleConfig(columnHeaderStyle, Config.Excel.ColumnHeaderStyle);
 
             var data = table.Rows.Select(row => row.Items.Select(item => item.Value).ToArray());
             var dataStartCell = columnHeaderRange.FirstColumn().LastCell().CellBelow();
@@ -145,22 +137,22 @@ namespace Zengo.Excel
 
             var oddLineDataStyle = dataRange.Rows(r => (r.RowNumber() - columnRowNumber) % 2 == 1).Style;
             oddLineDataStyle.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
-            ApplyStyleConfig(oddLineDataStyle, _config.OddLineStyle);
+            ApplyStyleConfig(oddLineDataStyle, Config.Excel.OddLineStyle);
 
             var evenLineDataStyle = dataRange.Rows(r => (r.RowNumber() - columnRowNumber) % 2 == 0).Style;
             evenLineDataStyle.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
-            ApplyStyleConfig(evenLineDataStyle, _config.EvenLineStyle);
+            ApplyStyleConfig(evenLineDataStyle, Config.Excel.EvenLineStyle);
 
             var tableRange = ws.Range(columnHeaderStartCell, dataRange.LastCell());
             tableRange.CreateTable();
-            tableRange.Style.Border.OutsideBorder = _config.TableOutlineBorderStyle;
+            tableRange.Style.Border.OutsideBorder = Config.Excel.TableOutlineBorderStyle;
 
-            if (_config.AutoSortByFirstColumn)
+            if (Config.Excel.AutoSortByFirstColumn)
             {
                 dataRange.Sort();
             }
 
-            if (_config.GroupTableRows)
+            if (Config.Excel.GroupTableRows)
             {
                 ws.Rows(tableRange.FirstRowUsed().RowNumber(), tableRange.LastRowUsed().RowNumber())
                     .Group();
@@ -208,6 +200,6 @@ namespace Zengo.Excel
         }
 
         private object Convert(object value, bool isDBNull)
-            => isDBNull ? _config.NullString : $"'{value}'";
+            => isDBNull ? Config.NullString : $"'{value}'";
     }
 }

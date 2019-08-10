@@ -1,6 +1,6 @@
 ﻿using ClosedXML.Excel;
 
-namespace Zengo
+namespace Zengo.Excel
 {
     public class ExcelBorderConfig
     {

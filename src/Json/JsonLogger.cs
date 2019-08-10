@@ -8,13 +8,6 @@ namespace Zengo.Json
 {
     internal class JsonLogger : ILogger
     {
-        private readonly JsonConfig _config;
-
-        public JsonLogger(JsonConfig config)
-        {
-            _config = config;
-        }
-
         public void Write(IEnumerable<ITable> before, IEnumerable<ITable> after)
         {
             WriteJson(before);
@@ -26,12 +19,12 @@ namespace Zengo.Json
             tables.ToList().ForEach(table =>
             {
                 var dateTime = tables.Min(t => t.DateTime);
-                var fileName = string.Format($"{table.Name}-{_config.FileNameFormat}.json", dateTime);
+                var fileName = string.Format($"{table.Name}-{Config.FileNameFormat}.json", dateTime);
 
                 using (var file = File.Open(fileName, FileMode.Create, FileAccess.Write, FileShare.Read))
                 using (var sw = new StreamWriter(file))
                 {
-                    sw.WriteLine(JsonConvert.SerializeObject(table, _config.JsonSerializerSettings));
+                    sw.WriteLine(JsonConvert.SerializeObject(table, Config.Json));
                 }
             });
         }

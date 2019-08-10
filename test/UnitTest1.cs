@@ -1,8 +1,8 @@
 using System;
+using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
 using Npgsql;
 using Zengo;
 
@@ -11,54 +11,61 @@ namespace Test
     [TestClass]
     public class UnitTest1
     {
-        private const string TABLE = "zengo_test";
-        private const string FILTER = "order by product_id";
+        private const string TableName = "zengo_test";
 
         [TestMethod]
         public void TestMethod1()
         {
-            var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+            Zengo.Config.Csv.Encoding = Encoding.GetEncoding(932);
 
-            using (var connection = new NpgsqlConnection(connectionString))
+            using (_connection.Zengo()
+                .SaveAsCsv(TableName)
+                .SaveAsExcel(TableName)
+                .SaveAsJson(TableName)
+                .ToDisposable())
             {
-                connection.Open();
+                Task.Delay(TimeSpan.FromSeconds(3)).Wait();
 
-                SetupTestData(connection);
+                var sql = $@"
+update {TableName} set
+    product_price = @product_price,
+    updated_at = now(),
+    updated_by = @updated_by
+where product_id = @product_id
+";
 
-                var csvConfig = new CsvConfig
+                _connection.Execute(sql, new
                 {
-                    NullString = "[NULL]",
-                };
-
-                var excelConfig = new ExcelConfig { };
-
-                var jsonConfig = new JsonConfig
-                {
-                    JsonSerializerSettings = new JsonSerializerSettings
-                    {
-                        Formatting = Formatting.Indented
-                    }
-                };
-
-                using (connection.Zengo()
-                    .SaveAsCsv(TABLE, FILTER, csvConfig)
-                    .SaveAsExcel(TABLE, FILTER, excelConfig)
-                    .SaveAsJson(TABLE, FILTER, jsonConfig)
-                    .ToDisposable())
-                {
-                    Task.Delay(TimeSpan.FromSeconds(3)).Wait();
-
-                    connection.Execute($@"update {TABLE} set product_price = @product_price, updated_at = now(), updated_by = @updated_by where product_id = @product_id",
-                        new { product_id = 1, product_price = 165, updated_by = "Sam" });
-                }
+                    product_id = 1,
+                    product_price = 165,
+                    updated_by = "Sam"
+                });
             }
         }
 
-        private void SetupTestData(NpgsqlConnection connection)
+        private static NpgsqlConnection _connection;
+
+        [ClassInitialize]
+        public static void ClassInitialize(TestContext context)
         {
-            connection.Execute($@"
+            var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+            _connection = new NpgsqlConnection(connectionString);
+            _connection.Open();
+        }
+
+        [ClassCleanup]
+        public static void ClassCleanup()
+        {
+            _connection?.Dispose();
+            _connection = null;
+        }
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            var ddl = $@"
 drop table if exists zengo_test;
-create table {TABLE}
+create table {TableName}
 (
     product_id integer not null generated always as identity (increment 1 start 1 minvalue 1),
     product_name character varying(30) not null,
@@ -70,15 +77,47 @@ create table {TABLE}
     updated_by character varying(20) default null,
     constraint products_pkey primary key (product_id)
 );
-");
+";
+            _connection.Execute(ddl);
 
-            connection.Execute($@"insert into {TABLE} (product_name, product_price, supplier_id, created_by, updated_by) values (@product_name, @product_price, @supplier_id, @created_by, @updated_by)",
-                new[]
-                {
-                    new { product_name = "Apple", product_price = 100, supplier_id = 1, created_by = "John", updated_by = "John" },
-                    new { product_name = "Orange", product_price = 150, supplier_id = 2, created_by = "John", updated_by = "John" },
-                    new { product_name = "Melon", product_price = 200, supplier_id = 3, created_by = "John", updated_by = "John" }
-                });
+            var sql = $@"
+insert into {TableName} (
+    product_name,
+    product_price,
+    supplier_id,
+    created_by,
+    updated_by
+) values (
+    @product_name,
+    @product_price,
+    @supplier_id,
+    @created_by,
+    @updated_by
+)";
+            _connection.Execute(sql, new[]
+            {
+                new {
+                    product_name = "Apple",
+                    product_price = 100,
+                    supplier_id = 1,
+                    created_by = "John",
+                    updated_by = "John"
+                },
+                new {
+                    product_name = "Orange",
+                    product_price = 150,
+                    supplier_id = 2,
+                    created_by = "John",
+                    updated_by = "John"
+                },
+                new {
+                    product_name = "Melon",
+                    product_price = 200,
+                    supplier_id = 3,
+                    created_by = "John",
+                    updated_by = "John"
+                }
+            });
         }
     }
 }
